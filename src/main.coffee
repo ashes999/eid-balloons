@@ -42,11 +42,19 @@ class CoreGameplayState
       @player.body.velocity.y = MOVE_SPEED;
     else
       # Standing still
-      
+    
+    if @cursors.left.isDown
+      @player.body.velocity.x = -1 * MOVE_SPEED;
+    else if @cursors.right.isDown
+      @player.body.velocity.x = MOVE_SPEED;
+    else
+      # Standing still
+    
     # Decelerate
-    if @player.body.velocity.y != 0
-      @player.body.velocity.y *= 0.9   
+    @player.body.velocity.x *= 0.9 if @player.body.velocity.x != 0      
+    @player.body.velocity.y *= 0.9 if @player.body.velocity.y != 0
       
+    @player.body.velocity.x = 0 if Math.abs(@player.body.velocity.x) <= 5
     @player.body.velocity.y = 0 if Math.abs(@player.body.velocity.y) <= 5
     
   _respawnOffScreenClouds: () ->
