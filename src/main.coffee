@@ -1,19 +1,24 @@
 class CoreGameplayState
   MOVE_SPEED = 300
-  NUM_CLOUDS = 5 # always on screen at once
+  NUM_CLOUDS = 5 # max on screen at once
+  NUM_BALLOONS = 5
   MAX_CLOUD_SPEED = 200
+  MAX_BALLOON_SPEED = 250
     
   preload: () ->  
     @game.load.image('sky', 'assets/graphics/sky.png')
     @game.load.image('cloud', 'assets/graphics/cloud.png')
     @game.load.image('player', 'assets/graphics/player.png')
+    @game.load.image('balloon', 'assets/graphics/balloon.png')
+    @game.load.image('ui-balloons', 'assets/graphics/balloons.png')
 
   create: () ->
     #  A simple background for our game
     @game.add.sprite(0, 0, 'sky')
     @clouds = []
-    
-    # N clouds
+    @balloons = []
+
+    # NUM_CLOUDS clouds, randomly strewn
     for i in [1..NUM_CLOUDS]
       randomX = this._pickCloudX();
       randomY = Math.random() * @game.height
@@ -24,6 +29,20 @@ class CoreGameplayState
       scale = this._pickCloudScale()
       cloud.scale.setTo(scale, scale)
       @clouds.push(cloud)
+      
+    # NUM_BALLOONS balloons, randomly strewn
+    for i in [1..NUM_BALLOONS]
+      randomX = this._pickCloudX();
+      randomY = Math.random() * (@game.height - 64)
+      balloon = @game.add.sprite(randomX, randomY, 'balloon')
+      # 50-100% of target speed
+      halfSpeed = MAX_BALLOON_SPEED / 2
+      balloon.body.velocity.x = -(Math.random() * halfSpeed) - halfSpeed
+      balloon.randomY = (Math.random() * 500)
+      @balloons.push(balloon)
+    
+    balloons = @game.add.sprite(8, @game.height - 64 - 8, 'ui-balloons')
+    @num_balloons = @game.add.text(16, @game.height - 32, 'x 0', { fill: '#000' })
     
     @player = @game.add.sprite(0, 0, 'player')
     @game.camera.follow(@player)
@@ -32,6 +51,8 @@ class CoreGameplayState
   update: () ->
     this._updatePlayerVelocity();
     this._respawnOffScreenClouds();
+    this._applyWavesToBalloons();
+    this._respawnOffScreenBalloons();    
     
   # begin: private methods
   
@@ -64,6 +85,17 @@ class CoreGameplayState
         cloud.y = Math.random() * @game.height
         scale = this._pickCloudScale()
         cloud.scale.setTo(scale, scale)
+    
+  _respawnOffScreenBalloons: () ->
+    for balloon in @balloons
+      if balloon.x <= -balloon.width
+        balloon.x = this._pickCloudX()
+        balloon.y = Math.random() * (@game.height - 64)
+        balloon.randomY = (Math.random() * 500)
+    
+  _applyWavesToBalloons: () ->
+    for balloon in @balloons
+      balloon.y += (2 * Math.sin((@game.time.now + balloon.randomY) / 500))
     
   _pickCloudX: () ->
     return @game.width + (Math.random() * @game.width) 
