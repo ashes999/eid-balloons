@@ -1,6 +1,3 @@
-This template bundles together:
+Created for #onegameamonth October/2014.
 
-- CoffeeScript
-- Phaser.io
-- Travis-CI integration 
-- `gh-pages` branch for playing live
+Future versions may include mobile support.
