@@ -122,7 +122,7 @@ class CoreGameplayState
     # 50-100% of target speed
     halfSpeed = MAX_BALLOON_SPEED / 2
     balloon.body.velocity.x = -(Math.random() * halfSpeed) - halfSpeed
-    balloon.randomY = (Math.random() * 500)
+    balloon.randomY = (Math.random() * 2500)
     @balloons.push(balloon)
     
 window.onload = () ->  
