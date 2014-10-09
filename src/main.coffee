@@ -3,7 +3,7 @@ class CoreGameplayState
   NUM_CLOUDS = 5 # max on screen at once
   NUM_BALLOONS = 5
   MAX_CLOUD_SPEED = 200
-  MAX_BALLOON_SPEED = 250
+  MAX_BALLOON_SPEED = 250  
     
   preload: () ->  
     @game.load.image('sky', 'assets/graphics/sky.png')
@@ -13,28 +13,36 @@ class CoreGameplayState
     @game.load.image('ui-balloons', 'assets/graphics/balloons.png')
 
   create: () ->
+    @game.physics.startSystem(Phaser.Physics.ARCADE)
+    @balloonsCollected = 1
+    
     #  A simple background for our game
     @game.add.sprite(0, 0, 'sky')
     @clouds = []
-    @balloons = []
+    cloudsGroup = @game.add.group()
+    cloudsGroup.enableBody = true
+    @balloons = []    
 
     # NUM_CLOUDS clouds, randomly strewn
     for i in [1..NUM_CLOUDS]
       randomX = this._pickCloudX();
       randomY = Math.random() * @game.height
-      cloud = @game.add.sprite(randomX, randomY, 'cloud')
-      quarterSpeed = MAX_CLOUD_SPEED / 4
+      cloud = cloudsGroup.create(randomX, randomY, 'cloud')
+      quarterSpeed = MAX_CLOUD_SPEED / 4      
       # 25-100% of MAX_CLOUD_SPEED
       cloud.body.velocity.x = -(Math.random() * 3 * quarterSpeed) - quarterSpeed
       scale = this._pickCloudScale()
       cloud.scale.setTo(scale, scale)
       @clouds.push(cloud)
+    
+    @balloonGroup = @game.add.group()
+    @balloonGroup.enableBody = true
       
     # NUM_BALLOONS balloons, randomly strewn
     for i in [1..NUM_BALLOONS]
       randomX = this._pickCloudX();
       randomY = Math.random() * (@game.height - 64)
-      balloon = @game.add.sprite(randomX, randomY, 'balloon')
+      balloon = @balloonGroup.create(randomX, randomY, 'balloon')
       # 50-100% of target speed
       halfSpeed = MAX_BALLOON_SPEED / 2
       balloon.body.velocity.x = -(Math.random() * halfSpeed) - halfSpeed
@@ -42,17 +50,27 @@ class CoreGameplayState
       @balloons.push(balloon)
     
     balloons = @game.add.sprite(8, @game.height - 64 - 8, 'ui-balloons')
-    @num_balloons = @game.add.text(16, @game.height - 32, 'x 0', { fill: '#000' })
+    
+    @numBalloons = @game.add.text(16, @game.height - 32, 'x0', { fill: '#000' })
     
     @player = @game.add.sprite(0, 0, 'player')
+    @game.physics.enable(@player, Phaser.Physics.ARCADE)
+    
     @game.camera.follow(@player)
-    @cursors = game.input.keyboard.createCursorKeys();  
+    @cursors = game.input.keyboard.createCursorKeys()    
     
   update: () ->
-    this._updatePlayerVelocity();
-    this._respawnOffScreenClouds();
-    this._applyWavesToBalloons();
-    this._respawnOffScreenBalloons();    
+    @game.physics.arcade.overlap(@player, @balloonGroup, (player, balloon) ->
+      balloon.kill()
+      @balloonsCollected += 1
+    () ->
+      @numBalloons.text = "x#{@balloonsCollected}"
+    , this)
+      
+    this._updatePlayerVelocity()
+    this._respawnOffScreenClouds()
+    this._applyWavesToBalloons()
+    this._respawnOffScreenBalloons()
     
   # begin: private methods
   
@@ -102,7 +120,7 @@ class CoreGameplayState
   
   _pickCloudScale: () ->
     return 0.25 + (Math.random() * 0.75)
-  
+    
 window.onload = () ->  
   @game = new Phaser.Game(800, 600, Phaser.AUTO, '', new CoreGameplayState)  
 
