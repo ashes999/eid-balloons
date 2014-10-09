@@ -14,7 +14,7 @@ class CoreGameplayState
 
   create: () ->
     @game.physics.startSystem(Phaser.Physics.ARCADE)
-    @balloonsCollected = 1
+    @balloonsCollected = 0
     
     #  A simple background for our game
     @game.add.sprite(0, 0, 'sky')
@@ -40,14 +40,7 @@ class CoreGameplayState
       
     # NUM_BALLOONS balloons, randomly strewn
     for i in [1..NUM_BALLOONS]
-      randomX = this._pickCloudX();
-      randomY = Math.random() * (@game.height - 64)
-      balloon = @balloonGroup.create(randomX, randomY, 'balloon')
-      # 50-100% of target speed
-      halfSpeed = MAX_BALLOON_SPEED / 2
-      balloon.body.velocity.x = -(Math.random() * halfSpeed) - halfSpeed
-      balloon.randomY = (Math.random() * 500)
-      @balloons.push(balloon)
+      this._spawnBalloon()
     
     balloons = @game.add.sprite(8, @game.height - 64 - 8, 'ui-balloons')
     
@@ -60,12 +53,7 @@ class CoreGameplayState
     @cursors = game.input.keyboard.createCursorKeys()    
     
   update: () ->
-    @game.physics.arcade.overlap(@player, @balloonGroup, (player, balloon) ->
-      balloon.kill()
-      @balloonsCollected += 1
-    () ->
-      @numBalloons.text = "x#{@balloonsCollected}"
-    , this)
+    @game.physics.arcade.overlap(@player, @balloonGroup, this._balloonCollected, null, this)
       
     this._updatePlayerVelocity()
     this._respawnOffScreenClouds()
@@ -120,6 +108,22 @@ class CoreGameplayState
   
   _pickCloudScale: () ->
     return 0.25 + (Math.random() * 0.75)
+    
+  _balloonCollected: (player, balloon) ->
+      balloon.kill()
+      @balloonsCollected += 1
+      @numBalloons.text = "x#{@balloonsCollected}"
+      this._spawnBalloon()
+      
+  _spawnBalloon: () ->
+    randomX = this._pickCloudX();
+    randomY = Math.random() * (@game.height - 64)
+    balloon = @balloonGroup.create(randomX, randomY, 'balloon')
+    # 50-100% of target speed
+    halfSpeed = MAX_BALLOON_SPEED / 2
+    balloon.body.velocity.x = -(Math.random() * halfSpeed) - halfSpeed
+    balloon.randomY = (Math.random() * 500)
+    @balloons.push(balloon)
     
 window.onload = () ->  
   @game = new Phaser.Game(800, 600, Phaser.AUTO, '', new CoreGameplayState)  
