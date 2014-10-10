@@ -12,6 +12,8 @@ class CoreGameplayState
   MAX_BALLOON_SPEED = 250
   MAX_BIRD_SPEED = 300
   MAX_BIRD_VERTICAL_SPEED = 50
+  
+  gameOver = false  
     
   preload: () ->  
     @game.load.image('sky', 'assets/graphics/sky.png')
@@ -65,15 +67,19 @@ class CoreGameplayState
   update: () ->
     @game.physics.arcade.overlap(@player, @balloons, this._balloonCollected, null, this)
     @game.physics.arcade.collide(@player, @birds)
-    this._updatePlayerVelocity()
-    this._respawnOffScreenClouds()
-    this._applyWavesToBalloons()
+    this._updatePlayerVelocity()    
     this._respawnOffScreenBalloons()
     this._respawnOffScreenBirds()
+    this._checkForGameOver()
+    
+    if (!@gameOver)
+      this._respawnOffScreenClouds()
+      this._applyWavesToBalloons()
     
   # begin: private methods
   
   _updatePlayerVelocity: () ->
+    return if @gameOver == true
     if @cursors.up.isDown
       @player.body.velocity.y = -1 * MOVE_SPEED;
     else if @cursors.down.isDown
@@ -159,6 +165,11 @@ class CoreGameplayState
     bird.body.velocity.y = ((Math.random() * (MAX_BIRD_VERTICAL_SPEED / 2)) + (MAX_BIRD_VERTICAL_SPEED / 2))
     bird.body.velocity.y *= -1 if randomY >= @game.height / 2
     
+  _checkForGameOver: () ->
+    @oldGameOver = @gameOver
+    @gameOver = true if @player.x <= -@player.width || @player.x >= @game.width || @player.y <= -@player.height || @player.y >= @game.height
+    if (@oldGameOver != true && @gameOver == true)
+      console.info("GAME OVER~!")
     
 window.onload = () ->  
   @game = new Phaser.Game(800, 600, Phaser.AUTO, '', new CoreGameplayState)  
