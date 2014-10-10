@@ -46,8 +46,7 @@ class CoreGameplayState
     @balloons.enableBody = true
       
     # NUM_BALLOONS balloons, randomly strewn
-    for i in [1..NUM_BALLOONS]
-      this._spawnBalloon()
+    this._spawnBalloon() for i in [1..NUM_BALLOONS]      
     
     # UI indicator
     balloons = @game.add.sprite(8, @game.height - 64 - 8, 'ui-balloons')
@@ -55,8 +54,7 @@ class CoreGameplayState
     
     @birds = @game.add.group()
     @birds.enableBody = true
-    for i in [1 .. NUM_BIRDS]
-      this._spawnBird()
+    this._spawnBird() for i in [1 .. NUM_BIRDS]      
     
     @player = @game.add.sprite(0, 0, 'player')
     @game.physics.enable(@player, Phaser.Physics.ARCADE)
@@ -116,10 +114,9 @@ class CoreGameplayState
   
   _respawnOffScreenBirds: () ->    
     @birds.forEach((bird) ->
-      if bird.x <= -bird.width    
-        this._spawnBird(bird)
-    , this)
-    
+      this._spawnBird(bird) if bird.x <= -bird.width
+    , this)     
+      
   _applyWavesToBalloons: () ->
     @balloons.forEach((balloon) ->
       balloon.y += (2 * Math.sin((@game.time.now + balloon.randomY) / 500))
@@ -155,8 +152,7 @@ class CoreGameplayState
       bird.body.immovable = true
     else
       bird.x = randomX
-      bird.y = randomY
-      console.info("Respawned at #{bird.x}, #{bird.y}")    
+      bird.y = randomY      
     
     halfSpeed = MAX_BIRD_SPEED / 2    
     bird.body.velocity.x = -(Math.random() * halfSpeed) - halfSpeed
