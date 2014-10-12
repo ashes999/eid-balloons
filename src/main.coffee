@@ -105,6 +105,7 @@ class CoreGameplayState
     else
       if (game.input.activePointer.isDown)
         @gameOver = false
+        # Don't allow multiple clicks while restarting
         if (!@restarting)
           @restarting = true
           @fadeOutTween.start()
