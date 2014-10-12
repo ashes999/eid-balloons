@@ -21,14 +21,16 @@ class CoreGameplayState
     @game.load.image('player', 'assets/graphics/player.png')
     @game.load.image('balloon', 'assets/graphics/balloon.png')
     @game.load.image('bird', 'assets/graphics/bird.png')
+    @game.load.image('blackout', 'assets/graphics/blackout.png')
     
     @game.load.image('ui-balloons', 'assets/graphics/balloons.png')
+    @game.load.image('ui-game-over', 'assets/graphics/game-over.png')
+    @game.load.image('ui-restart', 'assets/graphics/restart-button.png')
 
   create: () ->
     @game.physics.startSystem(Phaser.Physics.ARCADE)
     @numBalloonsCollected = 0
     
-    #  A simple background for our game
     @game.add.sprite(0, 0, 'sky')    
     @clouds = @game.add.group()
     @clouds.enableBody = true
@@ -61,20 +63,52 @@ class CoreGameplayState
     @player = @game.add.sprite(0, 0, 'player')
     @game.physics.enable(@player, Phaser.Physics.ARCADE)
     
-    @game.camera.follow(@player)
-    @cursors = game.input.keyboard.createCursorKeys()    
+    @blackout = @game.add.sprite(0, 0, 'blackout')
+    @blackout.alpha = 0
     
-  update: () ->
-    @game.physics.arcade.overlap(@player, @balloons, this._balloonCollected, null, this)
-    @game.physics.arcade.collide(@player, @birds)
-    this._updatePlayerVelocity()    
-    this._respawnOffScreenBalloons()
-    this._respawnOffScreenBirds()
+    @game.camera.follow(@player)
+    @cursors = game.input.keyboard.createCursorKeys()
+    
+    # Used for game-over and restart
+    fadeInTween = @game.add.tween(@blackout)
+    @fadeOutTween = @game.add.tween(@blackout)
+    @fadeOutTween.to({ alpha: 1 }, 500, null)
+    @fadeOutTween.onComplete.add(() ->
+      @gameOverText.destroy()
+      @restart.kill()
+      
+      fadeInTween.to({ alpha: 0 }, 500, null)
+      fadeInTween.start()
+      fadeInTween.onComplete.add(() ->
+        @gameOver = false
+        @restarting = false
+      , this)
+      
+      @restarting = false
+      
+      @player.x = @player.y = 0
+      @player.body.velocity.x = 0
+      @player.body.velocity.y = 0
+    , this)
+    
+  update: () ->   
     this._checkForGameOver()
+    this._respawnOffScreenClouds()
+    this._applyWavesToBalloons()
     
     if (!@gameOver)
-      this._respawnOffScreenClouds()
-      this._applyWavesToBalloons()
+      @game.physics.arcade.overlap(@player, @balloons, this._balloonCollected, null, this)
+      @game.physics.arcade.collide(@player, @birds)
+      this._updatePlayerVelocity()    
+      this._respawnOffScreenBalloons()
+      this._respawnOffScreenBirds()      
+    else
+      if (game.input.activePointer.isDown)
+        @gameOver = false
+        if (!@restarting)
+          @restarting = true
+          @fadeOutTween.start()
+        
     
   # begin: private methods
   
@@ -168,8 +202,26 @@ class CoreGameplayState
   _checkForGameOver: () ->
     @oldGameOver = @gameOver
     @gameOver = true if @player.x <= -@player.width || @player.x >= @game.width || @player.y <= -@player.height || @player.y >= @game.height
-    if (@oldGameOver != true && @gameOver == true)
-      console.info("GAME OVER~!")
+    this._gameOver() if (@oldGameOver != true && @gameOver == true && !@restarting)
+      
+  _gameOver: () ->
+    console.log("Game over!")
+    @gameOverText = @game.add.sprite(0, 0, 'ui-game-over')
+    this._centerImage(@gameOverText)
+    @gameOverText.y -= @gameOverText.height / 2
+    
+    @restart = @game.add.sprite(0, 0, 'ui-restart')
+    this._centerImage(@restart)
+    @restart.y = @gameOverText.y + @gameOverText.height
+    
+    @player.body.velocity.x = 0
+    @player.body.velocity.y = 0
+    
+  _centerImage: (sprite) ->
+    sprite.x = (@game.width - sprite.width) / 2
+    sprite.y = (@game.height - sprite.height) / 2
+    
+    @blackout.bringToTop()
     
 window.onload = () ->  
   @game = new Phaser.Game(800, 600, Phaser.AUTO, '', new CoreGameplayState)  
