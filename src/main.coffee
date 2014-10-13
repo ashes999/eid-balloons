@@ -98,7 +98,7 @@ class CoreGameplayState
     , this)
     
   update: () ->   
-    this._checkForGameOver()
+    #this._checkForGameOver()
     this._respawnOffScreenClouds()
     this._applyWavesToBalloons()
     
@@ -231,5 +231,5 @@ class CoreGameplayState
     @blackout.bringToTop()
     
 window.onload = () ->  
-  @game = new Phaser.Game(800, 600, Phaser.AUTO, '', new CoreGameplayState)  
+  @game = new Phaser.Game(800, 600, Phaser.CANVAS, '', new CoreGameplayState)  
 
