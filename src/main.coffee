@@ -28,6 +28,12 @@ class CoreGameplayState
     @game.load.image('ui-restart', 'assets/graphics/restart-button.png')
 
   create: () ->
+    # Debugging only
+    @game.time.advancedTiming = true
+    window.setInterval(() ->
+        console.info("#{@game.time.fps} FPS")
+    , 1000);
+    
     @game.physics.startSystem(Phaser.Physics.ARCADE)
     @numBalloonsCollected = 0
     
