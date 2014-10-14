@@ -84,11 +84,7 @@ class CoreGameplayState
         @restarting = false
       , this)
       
-      @restarting = false
-      
-      @player.x = @player.y = 0
-      @player.body.velocity.x = 0
-      @player.body.velocity.y = 0
+      this._reset()
     , this)
     
     # Debugging only    
@@ -214,7 +210,6 @@ class CoreGameplayState
     this._gameOver() if (@oldGameOver != true && @gameOver == true && !@restarting)
       
   _gameOver: () ->
-    console.log("Game over!")
     @gameOverText = @game.add.sprite(0, 0, 'ui-game-over')
     this._centerImage(@gameOverText)
     @gameOverText.y -= @gameOverText.height / 2
@@ -231,6 +226,15 @@ class CoreGameplayState
     sprite.y = (@game.height - sprite.height) / 2
     
     @blackout.bringToTop()
+    
+  # After game over, on start-new-game
+  _reset: () ->
+    @restarting = false    
+    @player.x = @player.y = 0
+    @player.body.velocity.x = 0
+    @player.body.velocity.y = 0
+    @numBalloonsCollected = 0
+    @numBalloons.text = "x#{@numBalloonsCollected}"
     
 window.onload = () ->  
   @game = new Phaser.Game(800, 600, Phaser.CANVAS, '', new CoreGameplayState)  
