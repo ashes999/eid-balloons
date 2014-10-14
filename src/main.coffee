@@ -28,12 +28,6 @@ class CoreGameplayState
     @game.load.image('ui-restart', 'assets/graphics/restart-button.png')
 
   create: () ->
-    # Debugging only
-    @game.time.advancedTiming = true
-    window.setInterval(() ->
-        console.info("#{@game.time.fps} FPS")
-    , 1000);
-    
     @game.physics.startSystem(Phaser.Physics.ARCADE)
     @numBalloonsCollected = 0
     
@@ -97,8 +91,16 @@ class CoreGameplayState
       @player.body.velocity.y = 0
     , this)
     
+    # Debugging only    
+    @game.time.advancedTiming = true
+    @fps = @game.add.text(0, 0, '', { fill: '#000' })
+    
+    window.setInterval(() =>
+      @fps.text = "#{@game.time.fps} FPS" unless @game.time.fps == 0
+    , 1000);
+    
   update: () ->   
-    #this._checkForGameOver()
+    this._checkForGameOver()
     this._respawnOffScreenClouds()
     this._applyWavesToBalloons()
     
