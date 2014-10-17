@@ -75,6 +75,7 @@ class CoreGameplayState
     @fadeOutTween.to({ alpha: 1 }, 500, null)
     @fadeOutTween.onComplete.add(() ->
       @gameOverText.destroy()
+      @scoreText.destroy()
       @restart.kill()
       
       fadeInTween.to({ alpha: 0 }, 500, null)
@@ -216,10 +217,12 @@ class CoreGameplayState
     
     @restart = @game.add.sprite(0, 0, 'ui-restart')
     this._centerImage(@restart)
-    @restart.y = @gameOverText.y + @gameOverText.height
+    @restart.y = @gameOverText.y + @gameOverText.height + 48
     
     @player.body.velocity.x = 0
     @player.body.velocity.y = 0
+    
+    @scoreText = @game.add.text(350, @restart.y - 48, "Score: #{@numBalloonsCollected}")
     
   _centerImage: (sprite) ->
     sprite.x = (@game.width - sprite.width) / 2
