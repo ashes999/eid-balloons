@@ -1,3 +1,4 @@
 node_modules
 lib/main.js
+lib/states/*.js
 *.*~
