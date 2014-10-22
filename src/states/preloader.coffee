@@ -1,8 +1,18 @@
 class window.Preloader
-  # TODO: add stuff for other states too
-  # TODO: seperate this state from the core game
   preload: () ->  
-
+  
+    ## Setup loading bar ##
+    loadingBar = @game.add.sprite(0, 0, 'loadingBar')
+    loadingBar.x = (@game.width - loadingBar.width) / 2
+    loadingBar.y = (@game.height - loadingBar.height) * 2 / 3
+    @load.setPreloadSprite(loadingBar)
+    
+    text = @game.add.text(0, 0, 'Loading ...', { fill: '#fff' })
+    text.x = (@game.width - text.width) / 2
+    text.y = (@game.height - text.height) / 2
+    
+    
+    ## Load everything! ##
     # Common
     @game.load.image('blackout', 'assets/graphics/blackout.png')
     
@@ -19,6 +29,6 @@ class window.Preloader
     @game.load.image('ui-balloons', 'assets/graphics/balloons.png')
     @game.load.image('ui-game-over', 'assets/graphics/game-over.png')
     @game.load.image('ui-restart', 'assets/graphics/restart-button.png')
-    
+
   create: () ->
     @game.state.start('titleScreen')
