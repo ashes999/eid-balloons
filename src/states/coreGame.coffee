@@ -42,7 +42,7 @@ class window.CoreGame
     
     # UI indicator
     balloons = @game.add.sprite(8, @game.height - 64 - 8, 'ui-balloons')
-    @numBalloons = @game.add.text(16, @game.height - 32, 'x0', { fill: '#000' })
+    #@numBalloons = @game.add.text(16, @game.height - 32, 'x0', { fill: '#000' })
     
     @birds = @game.add.group()
     @birds.enableBody = true
@@ -79,10 +79,12 @@ class window.CoreGame
     
     # Debugging only    
     @game.time.advancedTiming = true
-    @fps = @game.add.text(0, 0, '', { fill: '#000' })
+    #@fps = @game.add.text(0, 0, '', { fill: '#000' })
     
     window.setInterval(() =>
-      @fps.text = "#{@game.time.fps} FPS" unless @game.time.fps == 0
+      message = "#{@game.time.fps} FPS"
+      #@fps.text = message unless @game.time.fps == 0
+      console.info(message) unless @game.time.fps == 0
     , 1000);
     
   update: () ->   
@@ -154,7 +156,7 @@ class window.CoreGame
       
   _applyWavesToBalloons: () ->
     @balloons.forEach((balloon) ->
-      balloon.y += (2 * Math.sin((@game.time.now + balloon.randomY) / 500))
+      balloon.y += -1#(2 * Math.sin((@game.time.now + balloon.randomY) / 500))
     , this)
     
   _pickRandomX: () ->
@@ -166,7 +168,7 @@ class window.CoreGame
   _balloonCollected: (player, balloon) ->
       balloon.kill()
       @numBalloonsCollected += 1
-      @numBalloons.text = "x#{@numBalloonsCollected}"
+      #@numBalloons.text = "x#{@numBalloonsCollected}"
       this._spawnBalloon()
       
   _spawnBalloon: () ->
@@ -226,4 +228,4 @@ class window.CoreGame
     @player.body.velocity.x = 0
     @player.body.velocity.y = 0
     @numBalloonsCollected = 0
-    @numBalloons.text = "x#{@numBalloonsCollected}"
+    #@numBalloons.text = "x#{@numBalloonsCollected}"

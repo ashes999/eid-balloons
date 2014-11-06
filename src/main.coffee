@@ -5,6 +5,7 @@ window.onload = () ->
   @game.state.add('preLoader', new window.Preloader)
   @game.state.add('titleScreen', new window.TitleScreen)
   @game.state.add('coreGame', new window.CoreGame)
+
   
   @game.state.start('boot')
 
