@@ -156,7 +156,7 @@ class window.CoreGame
       
   _applyWavesToBalloons: () ->
     @balloons.forEach((balloon) ->
-      balloon.y += -1#(2 * Math.sin((@game.time.now + balloon.randomY) / 500))
+      balloon.y += (2 * Math.sin((@game.time.now + balloon.randomY) / 500))
     , this)
     
   _pickRandomX: () ->
