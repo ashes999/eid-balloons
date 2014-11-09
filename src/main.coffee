@@ -9,3 +9,8 @@ window.onload = () ->
   
   @game.state.start('boot')
 
+  window.addEventListener('resize', (event) ->
+    console.log("!")
+  )
+  
+  console.log("READY! w=#{window.width}, h=#{window.height}");
