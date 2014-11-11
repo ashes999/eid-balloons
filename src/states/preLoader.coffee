@@ -1,3 +1,5 @@
+# This uses a single image which is progressively displayed
+# TODO: use masking instead, like this: http://www.html5gamedevs.com/topic/1198-downscaling/?p=7568
 class window.Preloader
   preload: () ->  
   
