@@ -11,6 +11,9 @@ class window.Boot
     @game.load.image('loadingBar', 'assets/graphics/loading-bar.png');
     
   create: () ->
+    @game.onresize = () ->
+      @game.scale.refresh()
+      
     @game.state.start('preLoader')
     
   _setPixelPerfectScaling: () ->
